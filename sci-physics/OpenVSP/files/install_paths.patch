@@ -1,0 +1,118 @@
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index a57d3ae5..096649e7 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -96,10 +96,8 @@ ENDIF( APPLE )
+ 
+ INCLUDE( CPack )
+ 
+-INSTALL( DIRECTORY ../examples/airfoil/ DESTINATION airfoil )
+-INSTALL( DIRECTORY ../examples/CustomScripts/ DESTINATION CustomScripts )
+-INSTALL( DIRECTORY ../examples/matlab/ DESTINATION matlab )
+-INSTALL( DIRECTORY ../examples/scripts/ DESTINATION scripts )
+-INSTALL( DIRECTORY ../examples/textures/ DESTINATION textures )
+-INSTALL( FILES ../LICENSE DESTINATION . )
+-INSTALL( FILES ../README.md DESTINATION . )
++INSTALL( DIRECTORY ../examples/airfoil/ DESTINATION "share/OpenVSP/examples/airfoil" )
++INSTALL( DIRECTORY ../examples/CustomScripts/ DESTINATION "share/OpenVSP/examples/CustomScripts" )
++INSTALL( DIRECTORY ../examples/matlab/ DESTINATION "share/OpenVSP/examples/matlab" )
++INSTALL( DIRECTORY ../examples/scripts/ DESTINATION "share/OpenVSP/examples/scripts" )
++INSTALL( DIRECTORY ../examples/textures/ DESTINATION "share/OpenVSP/examples/textures" )
+diff --git a/src/python_api/CMakeLists.txt b/src/python_api/CMakeLists.txt
+index 7ec538ee..c05dac71 100644
+--- a/src/python_api/CMakeLists.txt
++++ b/src/python_api/CMakeLists.txt
+@@ -94,15 +94,15 @@ IF(SWIG_FOUND AND PYTHONLIBS_FOUND)
+ 	CONFIGURE_FILE(packages/openvsp/setup.py.in python/packages/openvsp/setup.py)
+ 	CONFIGURE_FILE(packages/openvsp/conda-recipe/meta.yaml.in python/packages/openvsp/conda-recipe/meta.yaml)
+ 
+-	INSTALL( DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/packages/ DESTINATION python
++	INSTALL( DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/packages/ DESTINATION "${CMAKE_INSTALL_LIBDIR}/python/site-packages/openvsp"
+ 			PATTERN setup.py.in EXCLUDE
+ 			PATTERN meta.yaml.in EXCLUDE)
+ 
+-	INSTALL( TARGETS _vsp LIBRARY DESTINATION python/openvsp/openvsp )
+-	INSTALL( FILES ${CMAKE_CURRENT_BINARY_DIR}/vsp.py DESTINATION python/openvsp/openvsp )
+-	INSTALL( FILES ${CMAKE_CURRENT_SOURCE_DIR}/test.py DESTINATION python/openvsp/openvsp/tests )
+-	INSTALL( FILES ${CMAKE_CURRENT_BINARY_DIR}/python/packages/openvsp/setup.py DESTINATION python/openvsp)
+-	INSTALL( FILES ${CMAKE_CURRENT_BINARY_DIR}/python/packages/openvsp/conda-recipe/meta.yaml DESTINATION python/openvsp/conda-recipe)
++	INSTALL( TARGETS _vsp LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}/python/site-packages/openvsp/openvsp" )
++	INSTALL( FILES ${CMAKE_CURRENT_BINARY_DIR}/vsp.py DESTINATION "${CMAKE_INSTALL_LIBDIR}/python/site-packages/openvsp/openvsp" )
++	INSTALL( FILES ${CMAKE_CURRENT_SOURCE_DIR}/test.py DESTINATION "${CMAKE_INSTALL_LIBDIR}/python/site-packages/openvsp/openvsp/tests" )
++	INSTALL( FILES ${CMAKE_CURRENT_BINARY_DIR}/python/packages/openvsp/setup.py DESTINATION "${CMAKE_INSTALL_LIBDIR}/python/site-packages/openvsp" )
++	INSTALL( FILES ${CMAKE_CURRENT_BINARY_DIR}/python/packages/openvsp/conda-recipe/meta.yaml DESTINATION "${CMAKE_INSTALL_LIBDIR}/python/site-packages/openvsp/conda-recipe" )
+ 
+ 	IF( NOT VSP_NO_GRAPHICS )
+ 
+diff --git a/src/vsp/CMakeLists.txt b/src/vsp/CMakeLists.txt
+index 8839b951..7e471495 100644
+--- a/src/vsp/CMakeLists.txt
++++ b/src/vsp/CMakeLists.txt
+@@ -78,7 +78,7 @@ IF( NOT VSP_NO_GRAPHICS )
+ 		${LIBIGES_LIBRARIES}
+ 	)
+ 
+-	INSTALL( TARGETS vsp RUNTIME DESTINATION . )
++	INSTALL( TARGETS vsp RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" )
+ 
+ 	ADD_EXECUTABLE(apitest_g
+ 	apitest_main.cpp
+@@ -153,7 +153,7 @@ TARGET_LINK_LIBRARIES(apitest
+ )
+ 
+ IF( VSP_INSTALL_API_TEST )
+-    INSTALL( TARGETS apitest RUNTIME DESTINATION . )
++    INSTALL( TARGETS apitest RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" )
+ ENDIF()
+ 
+ ADD_EXECUTABLE(vspscript
+@@ -184,4 +184,4 @@ TARGET_LINK_LIBRARIES(vspscript
+ 	${LIBIGES_LIBRARIES}
+ )
+ 
+-INSTALL( TARGETS vspscript RUNTIME DESTINATION . )
++INSTALL( TARGETS vspscript RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" )
+diff --git a/src/vsp_aero/slicer/CMakeLists.txt b/src/vsp_aero/slicer/CMakeLists.txt
+index 3b9cc4b2..7fbf74a3 100644
+--- a/src/vsp_aero/slicer/CMakeLists.txt
++++ b/src/vsp_aero/slicer/CMakeLists.txt
+@@ -26,4 +26,4 @@ utils.H
+ TARGET_LINK_LIBRARIES(vspslicer
+ )
+ 
+-INSTALL( TARGETS vspslicer RUNTIME DESTINATION . )
++INSTALL( TARGETS vspslicer RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" )
+diff --git a/src/vsp_aero/solver/CMakeLists.txt b/src/vsp_aero/solver/CMakeLists.txt
+index db66ca27..28c41fac 100644
+--- a/src/vsp_aero/solver/CMakeLists.txt
++++ b/src/vsp_aero/solver/CMakeLists.txt
+@@ -43,7 +43,7 @@ else()
+         DEPENDERS patch
+     )
+ 
+-    INSTALL( PROGRAMS ${BINARY_DIR}/vspaero DESTINATION . )
++    INSTALL( PROGRAMS ${BINARY_DIR}/vspaero DESTINATION "${CMAKE_INSTALL_BINDIR}" )
+ 
+   else()
+     set(BUILD_VSPAERO true)
+@@ -114,7 +114,7 @@ if(BUILD_VSPAERO)
+       INCLUDE( InstallRequiredSystemLibraries )
+     endif()
+ 
+-    INSTALL( TARGETS vspaero RUNTIME DESTINATION . )
++    INSTALL( TARGETS vspaero RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" )
+   endif()
+ 
+ endif()
+diff --git a/src/vsp_aero/viewer/CMakeLists.txt b/src/vsp_aero/viewer/CMakeLists.txt
+index 1a4bd02b..4163e540 100644
+--- a/src/vsp_aero/viewer/CMakeLists.txt
++++ b/src/vsp_aero/viewer/CMakeLists.txt
+@@ -70,6 +70,6 @@ IF( NOT VSP_NO_GRAPHICS )
+     ${OPENGL_LIBRARIES}
+   )
+ 
+-  INSTALL( TARGETS vspviewer RUNTIME DESTINATION . )
++  INSTALL( TARGETS vspviewer RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" )
+ 
+ ENDIF()
